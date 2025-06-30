@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+
+@theme {
+    --color-primary-bg: #000;
+    --color-secondary-bg: #3a3a3a;
+}
+
+:root {
+    @apply bg-primary-bg;
+}
+
+.device {
+    @apply bg-secondary-bg text-white;
+}
