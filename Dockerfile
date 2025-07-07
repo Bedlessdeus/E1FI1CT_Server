@@ -7,6 +7,7 @@ RUN apk add --no-cache \
 
 
 COPY package*.json ./
+COPY src/lib/server/sql/* ./lib/server/sql/
 COPY svelte.config.js ./
 
 RUN npm install

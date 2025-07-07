@@ -4,8 +4,6 @@ import type { ServerInit } from '@sveltejs/kit';
 import { v4 } from 'uuid';
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// TODO: Check and set state if user is admin
-	event.locals.admin = false;
 	return resolve(event);
 };
 

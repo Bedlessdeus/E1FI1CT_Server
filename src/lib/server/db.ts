@@ -13,7 +13,7 @@ const pool = createPool({
 });
 
 export const readSQL = (filename: string) => {
-	return readFileSync(env.SQL_DIR + filename + '.sql', 'utf8');
+	return readFileSync((env.SQL_DIR ?? 'lib/server/sql/') + filename + '.sql', 'utf8');
 };
 
 export const exec = async <T = any>(sql: string, params?: any[]): Promise<RowDataPacket[]> => {
