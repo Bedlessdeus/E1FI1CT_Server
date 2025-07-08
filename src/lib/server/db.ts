@@ -15,6 +15,9 @@ const pool = createPool({
 export const readSQL = (filename: string) => {
 	console.log(`Reading SQL file: ${filename}.sql`);
 	console.log(`${readdirSync('./')}`);
+	console.log(`${readdirSync('./lib')}`);
+	console.log(`${readdirSync('./lib/server')}`);
+	console.log(`${readdirSync('./lib/server/sql')}`);
 	return readFileSync((env.SQL_DIR ?? './lib/server/sql/') + filename + '.sql', 'utf8');
 };
 
