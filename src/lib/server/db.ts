@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import { readFileSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { createPool, type FieldPacket, type QueryResult, type RowDataPacket } from 'mysql2/promise';
 
 const dynamicSQL = (env.DYNAMIC_SQL ?? 'false').toLowerCase() == 'true' ? true : false;
@@ -13,7 +13,9 @@ const pool = createPool({
 });
 
 export const readSQL = (filename: string) => {
-	return readFileSync((env.SQL_DIR ?? 'lib/server/sql/') + filename + '.sql', 'utf8');
+	console.log(`Reading SQL file: ${filename}.sql`);
+	console.log(`${readdirSync('./')}`);
+	return readFileSync((env.SQL_DIR ?? './lib/server/sql/') + filename + '.sql', 'utf8');
 };
 
 export const exec = async <T = any>(sql: string, params?: any[]): Promise<RowDataPacket[]> => {
