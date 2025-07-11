@@ -8,14 +8,14 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 	}
 
 	const { postId } = params;
-	
+
 	if (!postId) {
 		return json({ error: 'Post ID is required' }, { status: 400 });
 	}
 
 	try {
 		const result = await posts.toggleLike(postId, locals.user.id);
-		
+
 		return json(result);
 	} catch (error) {
 		console.error('Error toggling like:', error);

@@ -5,7 +5,7 @@
 
 	let { data }: { data: PageData } = $props();
 
-		type Post = {
+	type Post = {
 		id: string;
 		content: string;
 		author: string;
@@ -13,7 +13,7 @@
 		likes: number;
 		comments: Comment[];
 		isLiked?: boolean;
-	}
+	};
 
 	type Comment = {
 		id: string;
@@ -21,9 +21,9 @@
 		author: string;
 		createdAt: string;
 		postId?: string;
-	}
+	};
 
-		let activeTab = $state<'posts' | 'likes' | 'comments'>('posts');
+	let activeTab = $state<'posts' | 'likes' | 'comments'>('posts');
 	let userPosts: Post[] = $state([]);
 	let likedPosts: Post[] = $state([]);
 	let userComments: Comment[] = $state([]);
@@ -32,7 +32,7 @@
 
 	async function loadUserActivity() {
 		isLoading = true;
-		
+
 		try {
 			const response = await fetch('/api/user/profile');
 			if (response.ok) {
@@ -55,7 +55,7 @@
 		const now = new Date();
 		const date = new Date(dateString);
 		const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-		
+
 		if (diffInSeconds < 60) return 'now';
 		if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
 		if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
@@ -67,92 +67,101 @@
 	});
 </script>
 
-<main class="min-h-screen bg-bg-secondary dark:bg-bg-primary-dark">
-	<div class="max-w-2xl mx-auto">
-		
-		<header class="bg-bg-primary dark:bg-bg-secondary-dark border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
+<main class="bg-bg-secondary dark:bg-bg-primary-dark min-h-screen">
+	<div class="mx-auto max-w-2xl">
+		<header
+			class="bg-bg-primary dark:bg-bg-secondary-dark sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700"
+		>
 			<div class="px-4 py-3">
-				<h1 class="text-xl font-bold text-text-primary dark:text-text-primary-dark">Profile</h1>
+				<h1 class="text-text-primary dark:text-text-primary-dark text-xl font-bold">Profile</h1>
 			</div>
 		</header>
 
-		
-		<div class="bg-bg-primary dark:bg-bg-secondary-dark border-b border-gray-200 dark:border-gray-700 p-6">
+		<div
+			class="bg-bg-primary dark:bg-bg-secondary-dark border-b border-gray-200 p-6 dark:border-gray-700"
+		>
 			<div class="flex items-center space-x-4">
-				<div class="w-16 h-16 bg-accent dark:bg-accent-dark rounded-full flex items-center justify-center">
-					<span class="text-white font-bold text-xl">{data.user.username.charAt(0).toUpperCase()}</span>
+				<div
+					class="bg-accent dark:bg-accent-dark flex h-16 w-16 items-center justify-center rounded-full"
+				>
+					<span class="text-xl font-bold text-white"
+						>{data.user.username.charAt(0).toUpperCase()}</span
+					>
 				</div>
 				<div>
-					<h2 class="text-2xl font-bold text-text-primary dark:text-text-primary-dark">@{data.user.username}</h2>
+					<h2 class="text-text-primary dark:text-text-primary-dark text-2xl font-bold">
+						@{data.user.username}
+					</h2>
 					<p class="text-text-secondary dark:text-text-secondary-dark">Active member</p>
 				</div>
 			</div>
-			
-			
-			<div class="flex space-x-6 mt-4">
+
+			<div class="mt-4 flex space-x-6">
 				<div class="text-center">
-					<div class="text-xl font-bold text-text-primary dark:text-text-primary-dark">{stats.posts}</div>
-					<div class="text-sm text-text-secondary dark:text-text-secondary-dark">Posts</div>
+					<div class="text-text-primary dark:text-text-primary-dark text-xl font-bold">
+						{stats.posts}
+					</div>
+					<div class="text-text-secondary dark:text-text-secondary-dark text-sm">Posts</div>
 				</div>
 				<div class="text-center">
-					<div class="text-xl font-bold text-text-primary dark:text-text-primary-dark">{stats.likes}</div>
-					<div class="text-sm text-text-secondary dark:text-text-secondary-dark">Likes</div>
+					<div class="text-text-primary dark:text-text-primary-dark text-xl font-bold">
+						{stats.likes}
+					</div>
+					<div class="text-text-secondary dark:text-text-secondary-dark text-sm">Likes</div>
 				</div>
 				<div class="text-center">
-					<div class="text-xl font-bold text-text-primary dark:text-text-primary-dark">{stats.comments}</div>
-					<div class="text-sm text-text-secondary dark:text-text-secondary-dark">Comments</div>
+					<div class="text-text-primary dark:text-text-primary-dark text-xl font-bold">
+						{stats.comments}
+					</div>
+					<div class="text-text-secondary dark:text-text-secondary-dark text-sm">Comments</div>
 				</div>
 			</div>
 		</div>
 
-		
-		<div class="bg-bg-primary dark:bg-bg-secondary-dark border-b border-gray-200 dark:border-gray-700">
+		<div
+			class="bg-bg-primary dark:bg-bg-secondary-dark border-b border-gray-200 dark:border-gray-700"
+		>
 			<div class="flex">
 				<button
 					class="flex-1 px-4 py-3 text-center font-medium transition-colors
-						{activeTab === 'posts' 
-							? 'text-accent dark:text-accent-dark border-b-2 border-accent dark:border-accent-dark' 
-							: 'text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
-						}"
-					onclick={() => activeTab = 'posts'}
+						{activeTab === 'posts'
+						? 'text-accent dark:text-accent-dark border-accent dark:border-accent-dark border-b-2'
+						: 'text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'}"
+					onclick={() => (activeTab = 'posts')}
 				>
 					Posts
 				</button>
 				<button
 					class="flex-1 px-4 py-3 text-center font-medium transition-colors
-						{activeTab === 'likes' 
-							? 'text-accent dark:text-accent-dark border-b-2 border-accent dark:border-accent-dark' 
-							: 'text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
-						}"
-					onclick={() => activeTab = 'likes'}
+						{activeTab === 'likes'
+						? 'text-accent dark:text-accent-dark border-accent dark:border-accent-dark border-b-2'
+						: 'text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'}"
+					onclick={() => (activeTab = 'likes')}
 				>
 					Likes
 				</button>
 				<button
 					class="flex-1 px-4 py-3 text-center font-medium transition-colors
-						{activeTab === 'comments' 
-							? 'text-accent dark:text-accent-dark border-b-2 border-accent dark:border-accent-dark' 
-							: 'text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'
-						}"
-					onclick={() => activeTab = 'comments'}
+						{activeTab === 'comments'
+						? 'text-accent dark:text-accent-dark border-accent dark:border-accent-dark border-b-2'
+						: 'text-text-secondary dark:text-text-secondary-dark hover:text-text-primary dark:hover:text-text-primary-dark'}"
+					onclick={() => (activeTab = 'comments')}
 				>
 					Comments
 				</button>
 			</div>
 		</div>
 
-		
 		<div class="divide-y divide-gray-200 dark:divide-gray-700">
 			{#if isLoading}
-				
 				{#each Array(3) as _}
-					<div class="bg-bg-primary dark:bg-bg-secondary-dark p-4 animate-pulse">
+					<div class="bg-bg-primary dark:bg-bg-secondary-dark animate-pulse p-4">
 						<div class="flex space-x-3">
-							<div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+							<div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600"></div>
 							<div class="flex-1 space-y-2">
-								<div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/4"></div>
-								<div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
-								<div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div>
+								<div class="h-4 w-1/4 rounded bg-gray-300 dark:bg-gray-600"></div>
+								<div class="h-4 w-3/4 rounded bg-gray-300 dark:bg-gray-600"></div>
+								<div class="h-4 w-1/2 rounded bg-gray-300 dark:bg-gray-600"></div>
 							</div>
 						</div>
 					</div>
@@ -160,23 +169,37 @@
 			{:else if activeTab === 'posts'}
 				{#if userPosts.length === 0}
 					<div class="bg-bg-primary dark:bg-bg-secondary-dark p-8 text-center">
-						<p class="text-text-secondary dark:text-text-secondary-dark">No posts yet. Share your first thought!</p>
+						<p class="text-text-secondary dark:text-text-secondary-dark">
+							No posts yet. Share your first thought!
+						</p>
 					</div>
 				{:else}
 					{#each userPosts as post}
-						<article class="bg-bg-primary dark:bg-bg-secondary-dark p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+						<article
+							class="bg-bg-primary dark:bg-bg-secondary-dark p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+						>
 							<div class="flex space-x-3">
-								<div class="w-10 h-10 bg-accent dark:bg-accent-dark rounded-full flex items-center justify-center flex-shrink-0">
-									<span class="text-white font-semibold text-sm">{post.author.charAt(0).toUpperCase()}</span>
+								<div
+									class="bg-accent dark:bg-accent-dark flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+								>
+									<span class="text-sm font-semibold text-white"
+										>{post.author.charAt(0).toUpperCase()}</span
+									>
 								</div>
-								<div class="flex-1 min-w-0">
+								<div class="min-w-0 flex-1">
 									<div class="flex items-center space-x-2">
-										<span class="font-semibold text-text-primary dark:text-text-primary-dark">@{post.author}</span>
+										<span class="text-text-primary dark:text-text-primary-dark font-semibold"
+											>@{post.author}</span
+										>
 										<span class="text-text-secondary dark:text-text-secondary-dark">·</span>
-										<span class="text-text-secondary dark:text-text-secondary-dark text-sm">{formatTimeAgo(post.createdAt)}</span>
+										<span class="text-text-secondary dark:text-text-secondary-dark text-sm"
+											>{formatTimeAgo(post.createdAt)}</span
+										>
 									</div>
 									<p class="text-text-primary dark:text-text-primary-dark mt-1">{post.content}</p>
-									<div class="flex items-center space-x-6 mt-3 text-text-secondary dark:text-text-secondary-dark">
+									<div
+										class="text-text-secondary dark:text-text-secondary-dark mt-3 flex items-center space-x-6"
+									>
 										<span class="flex items-center space-x-1">
 											<span>💬</span>
 											<span class="text-sm">{post.comments.length}</span>
@@ -194,23 +217,37 @@
 			{:else if activeTab === 'likes'}
 				{#if likedPosts.length === 0}
 					<div class="bg-bg-primary dark:bg-bg-secondary-dark p-8 text-center">
-						<p class="text-text-secondary dark:text-text-secondary-dark">No liked posts yet. Start exploring!</p>
+						<p class="text-text-secondary dark:text-text-secondary-dark">
+							No liked posts yet. Start exploring!
+						</p>
 					</div>
 				{:else}
 					{#each likedPosts as post}
-						<article class="bg-bg-primary dark:bg-bg-secondary-dark p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+						<article
+							class="bg-bg-primary dark:bg-bg-secondary-dark p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+						>
 							<div class="flex space-x-3">
-								<div class="w-10 h-10 bg-accent dark:bg-accent-dark rounded-full flex items-center justify-center flex-shrink-0">
-									<span class="text-white font-semibold text-sm">{post.author.charAt(0).toUpperCase()}</span>
+								<div
+									class="bg-accent dark:bg-accent-dark flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+								>
+									<span class="text-sm font-semibold text-white"
+										>{post.author.charAt(0).toUpperCase()}</span
+									>
 								</div>
-								<div class="flex-1 min-w-0">
+								<div class="min-w-0 flex-1">
 									<div class="flex items-center space-x-2">
-										<span class="font-semibold text-text-primary dark:text-text-primary-dark">@{post.author}</span>
+										<span class="text-text-primary dark:text-text-primary-dark font-semibold"
+											>@{post.author}</span
+										>
 										<span class="text-text-secondary dark:text-text-secondary-dark">·</span>
-										<span class="text-text-secondary dark:text-text-secondary-dark text-sm">{formatTimeAgo(post.createdAt)}</span>
+										<span class="text-text-secondary dark:text-text-secondary-dark text-sm"
+											>{formatTimeAgo(post.createdAt)}</span
+										>
 									</div>
 									<p class="text-text-primary dark:text-text-primary-dark mt-1">{post.content}</p>
-									<div class="flex items-center space-x-6 mt-3 text-text-secondary dark:text-text-secondary-dark">
+									<div
+										class="text-text-secondary dark:text-text-secondary-dark mt-3 flex items-center space-x-6"
+									>
 										<span class="flex items-center space-x-1">
 											<span>💬</span>
 											<span class="text-sm">{post.comments.length}</span>
@@ -228,24 +265,40 @@
 			{:else if activeTab === 'comments'}
 				{#if userComments.length === 0}
 					<div class="bg-bg-primary dark:bg-bg-secondary-dark p-8 text-center">
-						<p class="text-text-secondary dark:text-text-secondary-dark">No comments yet. Join the conversation!</p>
+						<p class="text-text-secondary dark:text-text-secondary-dark">
+							No comments yet. Join the conversation!
+						</p>
 					</div>
 				{:else}
 					{#each userComments as comment}
-						<article class="bg-bg-primary dark:bg-bg-secondary-dark p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+						<article
+							class="bg-bg-primary dark:bg-bg-secondary-dark p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+						>
 							<div class="flex space-x-3">
-								<div class="w-10 h-10 bg-accent dark:bg-accent-dark rounded-full flex items-center justify-center flex-shrink-0">
-									<span class="text-white font-semibold text-sm">{comment.author.charAt(0).toUpperCase()}</span>
+								<div
+									class="bg-accent dark:bg-accent-dark flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+								>
+									<span class="text-sm font-semibold text-white"
+										>{comment.author.charAt(0).toUpperCase()}</span
+									>
 								</div>
-								<div class="flex-1 min-w-0">
+								<div class="min-w-0 flex-1">
 									<div class="flex items-center space-x-2">
-										<span class="font-semibold text-text-primary dark:text-text-primary-dark">@{comment.author}</span>
+										<span class="text-text-primary dark:text-text-primary-dark font-semibold"
+											>@{comment.author}</span
+										>
 										<span class="text-text-secondary dark:text-text-secondary-dark">·</span>
-										<span class="text-text-secondary dark:text-text-secondary-dark text-sm">{formatTimeAgo(comment.createdAt)}</span>
+										<span class="text-text-secondary dark:text-text-secondary-dark text-sm"
+											>{formatTimeAgo(comment.createdAt)}</span
+										>
 									</div>
-									<p class="text-text-primary dark:text-text-primary-dark mt-1">{comment.content}</p>
+									<p class="text-text-primary dark:text-text-primary-dark mt-1">
+										{comment.content}
+									</p>
 									{#if comment.postId}
-										<p class="text-text-secondary dark:text-text-secondary-dark text-sm mt-2">Replying to a post</p>
+										<p class="text-text-secondary dark:text-text-secondary-dark mt-2 text-sm">
+											Replying to a post
+										</p>
 									{/if}
 								</div>
 							</div>
@@ -255,10 +308,13 @@
 			{/if}
 		</div>
 
-		
-		<div class="bg-bg-primary dark:bg-bg-secondary-dark border-t border-gray-200 dark:border-gray-700 p-4">
+		<div
+			class="bg-bg-primary dark:bg-bg-secondary-dark border-t border-gray-200 p-4 dark:border-gray-700"
+		>
 			<form method="post" action="?/logout" use:enhance>
-				<button class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+				<button
+					class="w-full rounded-lg bg-red-500 px-4 py-2 font-medium text-white transition-colors hover:bg-red-600"
+				>
 					Sign out
 				</button>
 			</form>

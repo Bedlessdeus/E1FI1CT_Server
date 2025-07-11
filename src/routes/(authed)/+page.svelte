@@ -5,7 +5,7 @@
 
 	let { data }: { data: PageData } = $props();
 
-		type Post = {
+	type Post = {
 		id: string;
 		content: string;
 		author: string;
@@ -22,28 +22,27 @@
 		createdAt: string;
 	};
 
-		let posts: Post[] = $state([]);
+	let posts: Post[] = $state([]);
 	let isLoading = $state(true);
 	let newPostContent = $state('');
 	let ws: WebSocket | null = null;
 	let commentInputs: { [postId: string]: string } = $state({});
 
-		function connectWebSocket() {
+	function connectWebSocket() {
 		if (!browser) return;
 
-				if (ws && ws.readyState === WebSocket.OPEN) {
+		if (ws && ws.readyState === WebSocket.OPEN) {
 			return;
 		}
 
-				const isDev = import.meta.env.DEV;
-		const wsUrl = isDev
-			? 'ws:			: `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}
+		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		const wsUrl = `${protocol}//${window.location.host}/api/ws`;
 		console.log('Connecting to WebSocket:', wsUrl);
 		ws = new WebSocket(wsUrl);
 
 		ws.onopen = () => {
 			console.log('WebSocket connected successfully');
-						if (data.user?.id) {
+			if (data.user?.id) {
 				ws!.send(JSON.stringify({ type: 'authenticate', userId: data.user.id }));
 			}
 		};
@@ -70,7 +69,7 @@
 
 		ws.onclose = (event) => {
 			console.log('WebSocket disconnected', event.code, event.reason);
-						if (event.code !== 1001 && event.code !== 1000) {
+			if (event.code !== 1001 && event.code !== 1000) {
 				setTimeout(connectWebSocket, 3000);
 			}
 		};
@@ -80,7 +79,7 @@
 		};
 	}
 
-		async function loadPosts() {
+	async function loadPosts() {
 		isLoading = true;
 
 		try {
@@ -101,7 +100,7 @@
 		}
 	}
 
-		async function createPost() {
+	async function createPost() {
 		if (!newPostContent.trim()) return;
 
 		try {
@@ -116,11 +115,11 @@
 			if (response.ok) {
 				const { post } = await response.json();
 
-								if (ws && ws.readyState === WebSocket.OPEN) {
+				if (ws && ws.readyState === WebSocket.OPEN) {
 					ws.send(JSON.stringify({ type: 'create_post', post }));
 				}
 
-								posts = [post, ...posts];
+				posts = [post, ...posts];
 				newPostContent = '';
 			} else {
 				console.error('Failed to create post');
@@ -139,11 +138,11 @@
 			if (response.ok) {
 				const { likesCount, isLiked } = await response.json();
 
-								if (ws && ws.readyState === WebSocket.OPEN) {
+				if (ws && ws.readyState === WebSocket.OPEN) {
 					ws.send(JSON.stringify({ type: 'like_post', postId, likes: likesCount, isLiked }));
 				}
 
-								posts = posts.map((p) => (p.id === postId ? { ...p, likes: likesCount, isLiked } : p));
+				posts = posts.map((p) => (p.id === postId ? { ...p, likes: likesCount, isLiked } : p));
 			} else {
 				console.error('Failed to toggle like');
 			}
@@ -168,11 +167,11 @@
 			if (response.ok) {
 				const { comment } = await response.json();
 
-								if (ws && ws.readyState === WebSocket.OPEN) {
+				if (ws && ws.readyState === WebSocket.OPEN) {
 					ws.send(JSON.stringify({ type: 'add_comment', postId, comment }));
 				}
 
-								posts = posts.map((post) =>
+				posts = posts.map((post) =>
 					post.id === postId ? { ...post, comments: [...post.comments, comment] } : post
 				);
 
@@ -208,7 +207,6 @@
 
 <main class="bg-bg-secondary dark:bg-bg-primary-dark min-h-screen">
 	<div class="mx-auto max-w-2xl">
-		
 		<header
 			class="bg-bg-primary dark:bg-bg-secondary-dark sticky top-0 z-10 border-b border-gray-200 dark:border-gray-700"
 		>
@@ -217,7 +215,6 @@
 			</div>
 		</header>
 
-		
 		<div
 			class="bg-bg-primary dark:bg-bg-secondary-dark border-b border-gray-200 p-4 dark:border-gray-700"
 		>
@@ -251,10 +248,8 @@
 			</div>
 		</div>
 
-		
 		<div class="divide-y divide-gray-200 dark:divide-gray-700">
 			{#if isLoading}
-				
 				{#each Array(3) as _, i}
 					<div class="bg-bg-primary dark:bg-bg-secondary-dark animate-pulse p-4">
 						<div class="flex space-x-3">
@@ -277,22 +272,18 @@
 					</div>
 				{/each}
 			{:else}
-				
 				{#each posts as post (post.id)}
 					<article
 						class="bg-bg-primary dark:bg-bg-secondary-dark p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
 					>
 						<div class="flex space-x-3">
-							
 							<div
 								class="bg-accent dark:bg-accent-dark flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
 							>
 								<span class="text-sm font-semibold text-white">{post.author[0].toUpperCase()}</span>
 							</div>
 
-							
 							<div class="min-w-0 flex-1">
-								
 								<div class="mb-1 flex items-center space-x-2">
 									<span class="text-text-primary dark:text-text-primary-dark font-semibold"
 										>@{post.author}</span
@@ -303,16 +294,13 @@
 									>
 								</div>
 
-								
 								<p class="text-text-primary dark:text-text-primary-dark mb-3 whitespace-pre-wrap">
 									{post.content}
 								</p>
 
-								
 								<div
 									class="text-text-secondary dark:text-text-secondary-dark flex items-center space-x-6"
 								>
-									
 									<button
 										class="hover:text-accent dark:hover:text-accent-dark group flex items-center space-x-2 transition-colors"
 									>
@@ -331,7 +319,6 @@
 										<span class="text-sm">{post.comments.length}</span>
 									</button>
 
-									
 									<button
 										onclick={() => toggleLike(post.id)}
 										class="group flex items-center space-x-2 transition-colors hover:text-red-500"
@@ -358,7 +345,6 @@
 									</button>
 								</div>
 
-								
 								{#if post.comments.length > 0}
 									<div class="mt-4 space-y-3">
 										{#each post.comments as comment (comment.id)}
@@ -389,7 +375,6 @@
 									</div>
 								{/if}
 
-								
 								<div class="mt-3 flex space-x-3">
 									<div
 										class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-400"

@@ -3,7 +3,7 @@ import * as auth from '$lib/server/auth';
 import { building, dev } from '$app/environment';
 
 if (!building && !dev) {
-		console.log('WebSocket server will be initialized in production mode');
+	console.log('WebSocket server will be initialized in production mode');
 }
 
 const handleAuth: Handle = async ({ event, resolve }) => {
@@ -27,7 +27,5 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	event.locals.session = session;
 	return resolve(event);
 };
-
-
 
 export const handle: Handle = handleAuth;

@@ -9,14 +9,14 @@ console.log(`Starting WebSocket server on port ${PORT}...`);
 const wss = new WebSocketServer({ port: PORT });
 
 wss.on('connection', (ws) => {
-    console.log('Client connected');
-    const client = { ws, userId: null };
-    clients.add(client);
+	console.log('Client connected');
+	const client = { ws, userId: null };
+	clients.add(client);
 
 	ws.on('message', (data) => {
 		try {
 			const message = JSON.parse(data.toString());
-			
+
 			switch (message.type) {
 				case 'authenticate':
 					client.userId = message.userId;
@@ -50,13 +50,14 @@ wss.on('connection', (ws) => {
 
 function broadcast(message, excludeUserId) {
 	const data = JSON.stringify(message);
-	
-	clients.forEach(client => {
+
+	clients.forEach((client) => {
 		if (excludeUserId && client.userId === excludeUserId) {
 			return; // Don't send to the user who triggered the event
 		}
-		
-		if (client.ws.readyState === 1) { // WebSocket.OPEN
+
+		if (client.ws.readyState === 1) {
+			// WebSocket.OPEN
 			client.ws.send(data);
 		}
 	});

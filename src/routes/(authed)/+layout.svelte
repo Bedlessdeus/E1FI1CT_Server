@@ -1,13 +1,13 @@
 <script lang="ts">
 	import Navigation from '$lib/components/Navigation.svelte';
 	import type { LayoutData } from './$types';
-	
+
 	let { children, data }: { children: any; data: LayoutData } = $props();
 </script>
 
-<div class="flex min-h-screen bg-bg-secondary dark:bg-bg-primary-dark">
+<div class="bg-bg-secondary dark:bg-bg-primary-dark flex min-h-screen">
 	<Navigation />
-	<main class="flex-1 ml-64">
+	<main class="ml-64 flex-1">
 		{@render children()}
 	</main>
 </div>

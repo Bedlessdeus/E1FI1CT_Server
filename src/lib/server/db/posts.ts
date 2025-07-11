@@ -32,9 +32,9 @@ export interface UserStats {
 }
 
 async function trackActivity(
-	userId: string, 
-	activityType: string, 
-	targetId?: string, 
+	userId: string,
+	activityType: string,
+	targetId?: string,
 	metadata?: Record<string, any>
 ) {
 	await db.insert(userActivity).values({
@@ -47,10 +47,14 @@ async function trackActivity(
 	});
 }
 
-export async function getAllPosts(userId?: string, limit = 50, offset = 0): Promise<PostWithDetails[]> {
+export async function getAllPosts(
+	userId?: string,
+	limit = 50,
+	offset = 0
+): Promise<PostWithDetails[]> {
 	const now = new Date();
-	
-		const postsQuery = db
+
+	const postsQuery = db
 		.select({
 			id: post.id,
 			content: post.content,
@@ -68,9 +72,9 @@ export async function getAllPosts(userId?: string, limit = 50, offset = 0): Prom
 
 	if (posts.length === 0) return [];
 
-	const postIds = posts.map(p => p.id);
+	const postIds = posts.map((p) => p.id);
 
-		const likesData = await db
+	const likesData = await db
 		.select({
 			postId: like.postId,
 			count: count()
@@ -79,7 +83,7 @@ export async function getAllPosts(userId?: string, limit = 50, offset = 0): Prom
 		.where(inArray(like.postId, postIds))
 		.groupBy(like.postId);
 
-		const commentsData = await db
+	const commentsData = await db
 		.select({
 			postId: comment.postId,
 			count: count()
@@ -88,26 +92,23 @@ export async function getAllPosts(userId?: string, limit = 50, offset = 0): Prom
 		.where(inArray(comment.postId, postIds))
 		.groupBy(comment.postId);
 
-		let userLikes: string[] = [];
+	let userLikes: string[] = [];
 	let userFollowing: string[] = [];
 	if (userId) {
 		const userLikesData = await db
 			.select({ postId: like.postId })
 			.from(like)
-			.where(and(
-				eq(like.userId, userId),
-				inArray(like.postId, postIds)
-			));
-		userLikes = userLikesData.map(l => l.postId);
+			.where(and(eq(like.userId, userId), inArray(like.postId, postIds)));
+		userLikes = userLikesData.map((l) => l.postId);
 
-				const followingData = await db
+		const followingData = await db
 			.select({ followingId: follow.followingId })
 			.from(follow)
 			.where(eq(follow.followerId, userId));
-		userFollowing = followingData.map(f => f.followingId);
+		userFollowing = followingData.map((f) => f.followingId);
 	}
 
-		const commentsQuery = await db
+	const commentsQuery = await db
 		.select({
 			id: comment.id,
 			content: comment.content,
@@ -121,18 +122,18 @@ export async function getAllPosts(userId?: string, limit = 50, offset = 0): Prom
 		.where(inArray(comment.postId, postIds))
 		.orderBy(asc(comment.createdAt));
 
-		const likesMap = new Map(likesData.map(l => [l.postId, l.count]));
-	const commentsCountMap = new Map(commentsData.map(c => [c.postId, c.count]));
+	const likesMap = new Map(likesData.map((l) => [l.postId, l.count]));
+	const commentsCountMap = new Map(commentsData.map((c) => [c.postId, c.count]));
 	const commentsMap = new Map<string, typeof commentsQuery>();
-	
-	commentsQuery.forEach(comment => {
+
+	commentsQuery.forEach((comment) => {
 		if (!commentsMap.has(comment.postId)) {
 			commentsMap.set(comment.postId, []);
 		}
 		commentsMap.get(comment.postId)!.push(comment);
 	});
 
-		const postsWithDetails: PostWithDetails[] = posts.map(p => ({
+	const postsWithDetails: PostWithDetails[] = posts.map((p) => ({
 		id: p.id,
 		content: p.content,
 		author: p.author || 'Unknown',
@@ -143,7 +144,7 @@ export async function getAllPosts(userId?: string, limit = 50, offset = 0): Prom
 		commentsCount: commentsCountMap.get(p.id) || 0,
 		isLikedByUser: userId ? userLikes.includes(p.id) : false,
 		isFollowingAuthor: userId ? userFollowing.includes(p.authorId) : false,
-		comments: (commentsMap.get(p.id) || []).map(c => ({
+		comments: (commentsMap.get(p.id) || []).map((c) => ({
 			id: c.id,
 			content: c.content,
 			author: c.author || 'Unknown',
@@ -159,7 +160,7 @@ export async function getAllPosts(userId?: string, limit = 50, offset = 0): Prom
 export async function createPost(content: string, authorId: string): Promise<string> {
 	const postId = generateId();
 	const now = new Date();
-	
+
 	await db.insert(post).values({
 		id: postId,
 		content,
@@ -167,39 +168,37 @@ export async function createPost(content: string, authorId: string): Promise<str
 		createdAt: now
 	});
 
-		await trackActivity(authorId, 'post', postId, { content });
-	
+	await trackActivity(authorId, 'post', postId, { content });
+
 	return postId;
 }
 
-export async function toggleLike(postId: string, userId: string): Promise<{ isLiked: boolean; likesCount: number }> {
-		const existingLike = await db
+export async function toggleLike(
+	postId: string,
+	userId: string
+): Promise<{ isLiked: boolean; likesCount: number }> {
+	const existingLike = await db
 		.select()
 		.from(like)
 		.where(and(eq(like.postId, postId), eq(like.userId, userId)))
 		.limit(1);
 
 	if (existingLike.length > 0) {
-				await db
-			.delete(like)
-			.where(and(eq(like.postId, postId), eq(like.userId, userId)));
-		
-				await trackActivity(userId, 'unlike', postId);
+		await db.delete(like).where(and(eq(like.postId, postId), eq(like.userId, userId)));
+
+		await trackActivity(userId, 'unlike', postId);
 	} else {
-				await db.insert(like).values({
+		await db.insert(like).values({
 			id: generateId(),
 			postId,
 			userId,
 			createdAt: new Date()
 		});
-		
-				await trackActivity(userId, 'like', postId);
+
+		await trackActivity(userId, 'like', postId);
 	}
 
-		const likesResult = await db
-		.select({ count: count() })
-		.from(like)
-		.where(eq(like.postId, postId));
+	const likesResult = await db.select({ count: count() }).from(like).where(eq(like.postId, postId));
 	const likesCount = likesResult[0]?.count || 0;
 
 	return {
@@ -208,10 +207,14 @@ export async function toggleLike(postId: string, userId: string): Promise<{ isLi
 	};
 }
 
-export async function addComment(postId: string, content: string, authorId: string): Promise<string> {
+export async function addComment(
+	postId: string,
+	content: string,
+	authorId: string
+): Promise<string> {
 	const commentId = generateId();
 	const now = new Date();
-	
+
 	await db.insert(comment).values({
 		id: commentId,
 		content,
@@ -220,8 +223,8 @@ export async function addComment(postId: string, content: string, authorId: stri
 		createdAt: now
 	});
 
-		await trackActivity(authorId, 'comment', commentId, { postId, content });
-	
+	await trackActivity(authorId, 'comment', commentId, { postId, content });
+
 	return commentId;
 }
 
@@ -239,14 +242,16 @@ export async function getUserPosts(userId: string): Promise<PostWithDetails[]> {
 		.where(eq(post.authorId, userId))
 		.orderBy(desc(post.createdAt));
 
-		return userPosts.map(p => ({
+	return userPosts.map((p) => ({
 		id: p.id,
 		content: p.content,
 		author: p.author || 'Unknown',
 		authorId: p.authorId,
 		createdAt: new Date(p.createdAt),
 		updatedAt: new Date(p.createdAt),
-		likesCount: 0, 		commentsCount: 0, 		comments: []
+		likesCount: 0,
+		commentsCount: 0,
+		comments: []
 	}));
 }
 
@@ -266,8 +271,8 @@ export async function getUserLikedPosts(userId: string): Promise<PostWithDetails
 		.orderBy(desc(like.createdAt));
 
 	return likedPosts
-		.filter(p => p.id !== null)
-		.map(p => ({
+		.filter((p) => p.id !== null)
+		.map((p) => ({
 			id: p.id!,
 			content: p.content || '',
 			author: p.author || 'Unknown',
@@ -299,28 +304,23 @@ export async function getUserComments(userId: string) {
 }
 
 export async function getUserStats(userId: string): Promise<UserStats> {
-	const [postsCount, likesCount, commentsCount, followersCount, followingCount] = await Promise.all([
-				db.select({ count: count() })
-			.from(post)
-			.where(eq(post.authorId, userId)),
-		
-				db.select({ count: count() })
-			.from(like)
-			.leftJoin(post, eq(like.postId, post.id))
-			.where(eq(post.authorId, userId)),
-		
-				db.select({ count: count() })
-			.from(comment)
-			.where(eq(comment.authorId, userId)),
-		
-				db.select({ count: count() })
-			.from(follow)
-			.where(eq(follow.followingId, userId)),
-		
-				db.select({ count: count() })
-			.from(follow)
-			.where(eq(follow.followerId, userId))
-	]);
+	const [postsCount, likesCount, commentsCount, followersCount, followingCount] = await Promise.all(
+		[
+			db.select({ count: count() }).from(post).where(eq(post.authorId, userId)),
+
+			db
+				.select({ count: count() })
+				.from(like)
+				.leftJoin(post, eq(like.postId, post.id))
+				.where(eq(post.authorId, userId)),
+
+			db.select({ count: count() }).from(comment).where(eq(comment.authorId, userId)),
+
+			db.select({ count: count() }).from(follow).where(eq(follow.followingId, userId)),
+
+			db.select({ count: count() }).from(follow).where(eq(follow.followerId, userId))
+		]
+	);
 
 	return {
 		postsCount: postsCount[0]?.count || 0,
@@ -331,7 +331,10 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 	};
 }
 
-export async function toggleFollow(followerId: string, followingId: string): Promise<{ isFollowing: boolean }> {
+export async function toggleFollow(
+	followerId: string,
+	followingId: string
+): Promise<{ isFollowing: boolean }> {
 	if (followerId === followingId) {
 		throw new Error('Cannot follow yourself');
 	}
@@ -343,38 +346,42 @@ export async function toggleFollow(followerId: string, followingId: string): Pro
 		.limit(1);
 
 	if (existingFollow.length > 0) {
-				await db
+		await db
 			.delete(follow)
 			.where(and(eq(follow.followerId, followerId), eq(follow.followingId, followingId)));
-		
+
 		await trackActivity(followerId, 'unfollow', followingId);
 		return { isFollowing: false };
 	} else {
-				await db.insert(follow).values({
+		await db.insert(follow).values({
 			id: generateId(),
 			followerId,
 			followingId,
 			createdAt: new Date()
 		});
-		
+
 		await trackActivity(followerId, 'follow', followingId);
 		return { isFollowing: true };
 	}
 }
 
-export async function getUserFeed(userId: string, limit = 50, offset = 0): Promise<PostWithDetails[]> {
-		const followingUsers = await db
+export async function getUserFeed(
+	userId: string,
+	limit = 50,
+	offset = 0
+): Promise<PostWithDetails[]> {
+	const followingUsers = await db
 		.select({ followingId: follow.followingId })
 		.from(follow)
 		.where(eq(follow.followerId, userId));
 
 	if (followingUsers.length === 0) {
-				return getAllPosts(userId, limit, offset);
+		return getAllPosts(userId, limit, offset);
 	}
 
-	const followingIds = followingUsers.map(f => f.followingId);
+	const followingIds = followingUsers.map((f) => f.followingId);
 
-		const feedPosts = await db
+	const feedPosts = await db
 		.select({
 			id: post.id,
 			content: post.content,
@@ -389,34 +396,34 @@ export async function getUserFeed(userId: string, limit = 50, offset = 0): Promi
 		.limit(limit)
 		.offset(offset);
 
-		if (feedPosts.length === 0) return [];
+	if (feedPosts.length === 0) return [];
 
-	const postIds = feedPosts.map(p => p.id);
+	const postIds = feedPosts.map((p) => p.id);
 
-		const [likesData, commentsData, userLikes] = await Promise.all([
-		db.select({ postId: like.postId, count: count() })
+	const [likesData, commentsData, userLikes] = await Promise.all([
+		db
+			.select({ postId: like.postId, count: count() })
 			.from(like)
 			.where(inArray(like.postId, postIds))
 			.groupBy(like.postId),
-		
-		db.select({ postId: comment.postId, count: count() })
+
+		db
+			.select({ postId: comment.postId, count: count() })
 			.from(comment)
 			.where(inArray(comment.postId, postIds))
 			.groupBy(comment.postId),
-		
-		db.select({ postId: like.postId })
+
+		db
+			.select({ postId: like.postId })
 			.from(like)
-			.where(and(
-				eq(like.userId, userId),
-				inArray(like.postId, postIds)
-			))
+			.where(and(eq(like.userId, userId), inArray(like.postId, postIds)))
 	]);
 
-	const likesMap = new Map(likesData.map(l => [l.postId, l.count]));
-	const commentsCountMap = new Map(commentsData.map(c => [c.postId, c.count]));
-	const userLikesSet = new Set(userLikes.map(l => l.postId));
+	const likesMap = new Map(likesData.map((l) => [l.postId, l.count]));
+	const commentsCountMap = new Map(commentsData.map((c) => [c.postId, c.count]));
+	const userLikesSet = new Set(userLikes.map((l) => l.postId));
 
-	return feedPosts.map(p => ({
+	return feedPosts.map((p) => ({
 		id: p.id,
 		content: p.content,
 		author: p.author || 'Unknown',
@@ -426,7 +433,9 @@ export async function getUserFeed(userId: string, limit = 50, offset = 0): Promi
 		likesCount: likesMap.get(p.id) || 0,
 		commentsCount: commentsCountMap.get(p.id) || 0,
 		isLikedByUser: userLikesSet.has(p.id),
-		isFollowingAuthor: true, 		comments: [] 	}));
+		isFollowingAuthor: true,
+		comments: []
+	}));
 }
 
 export async function getUserActivity(userId: string, limit = 50): Promise<any[]> {

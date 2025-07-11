@@ -103,7 +103,6 @@
 						<span class="ml-2 text-sm">I agree to the Terms of Service</span>
 					</label>
 				</div>
-			
 
 				{#if form?.message}
 					<div

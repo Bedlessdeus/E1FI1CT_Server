@@ -30,7 +30,7 @@ export async function validateSessionToken(token: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const [result] = await db
 		.select({
-						user: { id: table.user.id, username: table.user.username },
+			user: { id: table.user.id, username: table.user.username },
 			session: table.session
 		})
 		.from(table.session)

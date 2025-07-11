@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	try {
 		const { content } = await request.json();
-		
+
 		if (!content || content.trim().length === 0) {
 			return json({ error: 'Content is required' }, { status: 400 });
 		}
@@ -36,10 +36,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const postId = await posts.createPost(content.trim(), locals.user.id);
-		
-				const allPosts = await posts.getAllPosts(locals.user.id, 1, 0);
-		const newPost = allPosts.find(p => p.id === postId);
-		
+
+		const allPosts = await posts.getAllPosts(locals.user.id, 1, 0);
+		const newPost = allPosts.find((p) => p.id === postId);
+
 		return json({ post: newPost, success: true }, { status: 201 });
 	} catch (error) {
 		console.error('Error creating post:', error);
