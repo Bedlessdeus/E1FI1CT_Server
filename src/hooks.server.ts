@@ -1,13 +1,33 @@
 import type { Handle } from '@sveltejs/kit';
-import { addDevice, exec, readSQL } from '$lib/server/db';
-import type { ServerInit } from '@sveltejs/kit';
-import { v4 } from 'uuid';
+import * as auth from '$lib/server/auth';
+import { building, dev } from '$app/environment';
 
-export const handle: Handle = async ({ event, resolve }) => {
+if (!building && !dev) {
+		console.log('WebSocket server will be initialized in production mode');
+}
+
+const handleAuth: Handle = async ({ event, resolve }) => {
+	const sessionToken = event.cookies.get(auth.sessionCookieName);
+
+	if (!sessionToken) {
+		event.locals.user = null;
+		event.locals.session = null;
+		return resolve(event);
+	}
+
+	const { session, user } = await auth.validateSessionToken(sessionToken);
+
+	if (session) {
+		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+	} else {
+		auth.deleteSessionTokenCookie(event);
+	}
+
+	event.locals.user = user;
+	event.locals.session = session;
 	return resolve(event);
 };
 
-export const init: ServerInit = async () => {
-	await exec(readSQL('init'));
-	addDevice(v4(), 'test_name', v4(), Math.random() * 10, Math.random() * 10);
-};
+
+
+export const handle: Handle = handleAuth;

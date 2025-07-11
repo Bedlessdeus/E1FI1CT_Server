@@ -1,10 +1,33 @@
 @import 'tailwindcss';
 
 @theme {
-    --color-gray-primary: #101010;
-    --color-gray-secondary: #171717;
+	
+	--color-bg-primary: #f8f9fa;
+	--color-bg-secondary: #e9ecef;
+	--color-text-primary: #1e293b;
+	--color-text-secondary: #64748b;
+	--color-accent: #3b82f6;
+
+	
+	--color-bg-primary-dark: #0a0a0a;
+	--color-bg-secondary-dark: #1a1a1a;
+	--color-text-primary-dark: #f1f5f9;
+	--color-text-secondary-dark: #94a3b8;
+	--color-accent-dark: #60a5fa;
 }
 
-:root {
-    @apply bg-gray-primary;
+body {
+	@apply bg-bg-primary text-text-primary dark:bg-bg-primary-dark dark:text-text-primary-dark;
+}
+
+form[id='log-form'] input {
+	@apply border-text-secondary dark:border-text-secondary-dark focus:border-accent hover:border-accent dark:focus:border-accent-dark dark:hover:border-accent-dark w-full rounded-md border p-1.5;
+}
+
+form[id='log-form'] label {
+	@apply text-text-primary dark:text-text-primary-dark mb-2 block text-sm font-medium select-none;
+}
+
+form[id='log-form'] button[type='submit'] {
+	@apply bg-accent hover:bg-accent/70 text-white disabled:bg-bg-primary-dark/50 disabled:cursor-not-allowed rounded-md px-4 py-2 transition-colors;
 }
